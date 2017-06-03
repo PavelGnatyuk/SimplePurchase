@@ -44,8 +44,10 @@ class AppProductInfoUpdater: ProductInfoUpdater {
         // and so contains the prices.
         // So we need to update these products' information if a predefined timeout has past.
         //
-        // `lasttime` is not nil here for sure, because it can be privaty set only from this class.
-        guard let interval = self.lastTime?.timeIntervalSinceNow else { return true }
+        // `lastTime` is not nil here for sure, because it can be privaty set only from this class.
+        guard let interval = self.lastTime?.timeIntervalSinceNow else {
+            return true
+        }
         return interval == 0 || -interval > self.timeout
     }
     

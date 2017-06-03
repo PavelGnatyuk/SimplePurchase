@@ -2,6 +2,7 @@
 //  ProductRequester.swift
 //
 //  Allows to request the product information for one or few products defined by their identifiers.
+//  The class is a wrapper for SKProductsRequest. It does not make sense to unit test it.
 //
 //
 //  Created by Pavel Gnatyuk on 29/04/2017.

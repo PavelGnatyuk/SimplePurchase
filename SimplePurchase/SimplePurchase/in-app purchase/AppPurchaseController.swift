@@ -106,7 +106,7 @@ class AppPurchaseController: NSObject, PurchaseController {
         // There is an assert in the ProductRequester initializer about the identifiers parameter.
         requestSent = checkedRequester.request(identifiers: identifiers) { [weak self] receivedProducts, invalid in
             if let controller = self {
-                controller.products?.store = receivedProducts
+                controller.products?.assignTo(store: receivedProducts)
                 controller.requestSent = false
             }
         }

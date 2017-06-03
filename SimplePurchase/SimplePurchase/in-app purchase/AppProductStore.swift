@@ -12,16 +12,18 @@ import StoreKit
 
 struct AppProductStore: ProductStore {
     var count: Int {
-        return self.store?.count ?? 0
+        return self.store.count
     }
     
-    var store: Array<SKProduct>?
+    private var store = [SKProduct]()
+    
+    mutating func assignTo(store: [SKProduct]) {
+        self.store = store
+    }
     
     subscript(identifier: String) -> SKProduct? {
-        guard let array = store, !identifier.isEmpty else {
-            return nil
-        }
-        for product in array where product.productIdentifier == identifier {
+        precondition(!identifier.isEmpty, "Cannot find a product for an empty identifier")
+        for product in store where product.productIdentifier == identifier {
             return product
         }
         return nil

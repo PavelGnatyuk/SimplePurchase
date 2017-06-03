@@ -20,7 +20,9 @@ public extension SKProduct {
 
 class TestProductStore: ProductStore {
     var count: Int = 1
-    var store: Array<SKProduct>?
+    
+    func assignTo(store: [SKProduct]) {
+    }
     
     subscript(identifier: String) -> SKProduct? {
         return SKProduct(identifier: "com.test.one", price: "1.23", priceLocale: Locale(identifier: "en_US"))
