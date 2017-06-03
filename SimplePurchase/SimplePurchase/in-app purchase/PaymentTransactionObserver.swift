@@ -1,6 +1,8 @@
 //
 //  PaymentTransactionObserver.swift
 //
+//  Exactly as it's named: the payment transaction observer.
+//
 //  Created by Pavel Gnatyuk on 29/04/2017.
 //
 //
@@ -9,8 +11,9 @@ import StoreKit
 
 protocol PaymentTransactionObserver: class {
     var canMakePayments: Bool { get }
-    var delegate: PaymentTransactionObserverDelegate? { get set }
-        
+    
+    init(delegate: PaymentTransactionObserverDelegate?)
+    
     func start()
     func stop()
     

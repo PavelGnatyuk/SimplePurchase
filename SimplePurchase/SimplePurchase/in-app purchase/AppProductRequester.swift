@@ -18,53 +18,50 @@ import StoreKit
  */
 class AppProductRequester: NSObject, ProductRequester {
     
-    var products: Array<SKProduct>?
-    var invalidProductIdentifiers: Array<String>?
-    
-    fileprivate(set) var onComplete: ((Array<SKProduct>?) -> Void)?
+    fileprivate(set) var onComplete: (([SKProduct], [String]) -> Void)?
     fileprivate(set) var productRequest: SKProductsRequest?
     
     /**
      Send request to the App Store
     */
-    func request(identifiers: Set<String>, onComplete: ((Array<SKProduct>?) -> Void)?) -> Bool {
+    func request(identifiers: Set<String>, onComplete: @escaping (([SKProduct], [String]) -> Void)) -> Bool {
         assert(productRequest == nil, "A previous request still exists")
-        assert(identifiers.count > 0, "No product identifiers")
-        
         guard identifiers.count > 0 else {
+            assertionFailure("No identifiers to request products")
             return false
         }
         
-        products = nil
-        invalidProductIdentifiers = nil
         productRequest = SKProductsRequest(productIdentifiers: identifiers)
-        productRequest?.delegate = self
-        self.onComplete = onComplete
-        productRequest?.start()
-        return true
+        if let requester = productRequest {
+            requester.delegate = self
+            self.onComplete = onComplete
+            requester.start()
+        }
+        return productRequest != nil
     }
 }
 
 extension AppProductRequester: SKProductsRequestDelegate {
     func productsRequest(_ request: SKProductsRequest, didReceive response: SKProductsResponse) {
         guard self.productRequest == request else {
+            assertionFailure("Received a response for a wrong request")
             return
         }
         
-        self.products = response.products
-        self.invalidProductIdentifiers = response.invalidProductIdentifiers
+        self.onComplete?(response.products, response.invalidProductIdentifiers)
         self.productRequest = nil
-        
-        self.onComplete?(self.products)
+        self.onComplete = nil
     }
  
     func request(_ request: SKRequest, didFailWithError error: Error) {
         guard self.productRequest == request else {
+            assertionFailure("Received a response for a wrong request")
             return
         }
         
-        self.onComplete?(nil)
+        self.onComplete?([], [])
         self.productRequest = nil
+        self.onComplete = nil
     }
 }
 

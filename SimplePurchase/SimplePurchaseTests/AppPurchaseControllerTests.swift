@@ -39,13 +39,13 @@ class AppPurchaseControllerTests: XCTestCase {
      */
     func testIsNotReadyToPurchase() {
         let controller = AppPurchaseController(identifiers: ["1"])
-        controller.observer = TestPaymentTransactionObserver()
+        controller.observer = TestPaymentTransactionObserver(delegate: controller)
         XCTAssertFalse(controller.isReadyToPurchase, "The controller is not ready to purchase")
     }
     
     func testIsReadyToPurchase() {
         let controller = AppPurchaseController(identifiers: ["1"])
-        controller.observer = TestPaymentTransactionObserver()
+        controller.observer = TestPaymentTransactionObserver(delegate: controller)
         controller.products = TestProductStore()
         XCTAssertTrue(controller.isReadyToPurchase, "The controller is not ready to purchase")
     }
@@ -66,7 +66,7 @@ class AppPurchaseControllerTests: XCTestCase {
     
     func testStart() {
         let controller = AppPurchaseController(identifiers: ["1"])
-        let observer = TestPaymentTransactionObserver()
+        let observer = TestPaymentTransactionObserver(delegate: controller)
         controller.observer = observer
         controller.start()
         XCTAssertTrue(observer.hasStarted, "Failed to start observer")
@@ -74,7 +74,7 @@ class AppPurchaseControllerTests: XCTestCase {
     
     func testRestore() {
         let controller = AppPurchaseController(identifiers: ["1"])
-        let observer = TestPaymentTransactionObserver()
+        let observer = TestPaymentTransactionObserver(delegate: controller)
         controller.observer = observer
         controller.restore()
         XCTAssertTrue(observer.hasRestored, "Failed to restore purchases")
@@ -110,7 +110,7 @@ class AppPurchaseControllerTests: XCTestCase {
     func testBuy() {
         let controller = AppPurchaseController(identifiers: ["1"])
         controller.products = TestProductStore()
-        let observer = TestPaymentTransactionObserver()
+        let observer = TestPaymentTransactionObserver(delegate: controller)
         controller.observer = observer
         
         let purchaseSent = controller.buy(identifier: "1")

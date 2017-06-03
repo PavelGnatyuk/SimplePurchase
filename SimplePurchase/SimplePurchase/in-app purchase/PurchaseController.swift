@@ -85,6 +85,8 @@ protocol PurchaseController {
     func restore()
 }
 
+// MARK: - Constants
+
 @objc
 class PurchaseControllerConsts: NSObject {
     static let kResponseAttributeIdentifier = "identifier"

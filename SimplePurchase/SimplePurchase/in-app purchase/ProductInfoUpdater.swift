@@ -1,6 +1,10 @@
 //
 //  ProductInfoUpdater.swift
 //
+//  Update product information from the App Store only if a predefined time period has past.
+//  For example, an application may check if the prices on the App Store were changed when the app
+//  was in the background.
+//
 //  Created by Pavel Gnatyuk on 27/04/2017.
 //
 //

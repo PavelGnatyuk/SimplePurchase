@@ -1,6 +1,10 @@
 //
 //  AppPaymentTransactionObserver.swift
 //
+//  Payment transaction observer - actually a wrapper for SKPaymentQueue adding new payment to it
+//  and handling all states of this payment in the queue.
+//
+//
 //  Created by Pavel Gnatyuk on 29/04/2017.
 //
 //
@@ -11,7 +15,11 @@ import StoreKit
 class AppPaymentTransactionObserver: NSObject, PaymentTransactionObserver {
     
     private(set) var active: Bool = false
-    weak var delegate: PaymentTransactionObserverDelegate?
+    fileprivate weak var delegate: PaymentTransactionObserverDelegate?
+    
+    required init(delegate: PaymentTransactionObserverDelegate?) {
+        self.delegate = delegate
+    }
     
     deinit {
         delegate = nil

@@ -20,7 +20,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     lazy var purchase: PurchaseController = {
         let controller = AppPurchaseController(identifiers: self.productIdentifiers)
         controller.converter = AppPriceConverter()
-        controller.observer = AppPaymentTransactionObserver()
+        controller.observer = AppPaymentTransactionObserver(delegate: controller)
         controller.requester = AppProductRequester()
         controller.products = AppProductStore()
         return controller
@@ -35,4 +35,3 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         return true
     }
 }
-

@@ -11,7 +11,7 @@ import StoreKit
 
 class TestProductRequester: ProductRequester {
     var counter = 0
-    func request(identifiers: Set<String>, onComplete: ((Array<SKProduct>?) -> Void)?) -> Bool {
+    func request(identifiers: Set<String>, onComplete: @escaping (([SKProduct], [String]) -> Void)) -> Bool {
         counter += 1
         return true
     }

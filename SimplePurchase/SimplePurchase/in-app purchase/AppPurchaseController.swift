@@ -86,9 +86,11 @@ class AppPurchaseController: NSObject, PurchaseController {
     }
     
     required init(identifiers: Set<String>) {
-        assert(identifiers.count > 0, "No identifiers and so nothing to do.")
+        precondition(identifiers.count > 0, "No identifiers and so nothing to do.")
         self.identifiers = identifiers
     }
+    
+    // MARK: - Request products
     
     func requestProducts() -> Bool {
         guard requestSent == false else {
@@ -102,7 +104,7 @@ class AppPurchaseController: NSObject, PurchaseController {
         }
         
         // There is an assert in the ProductRequester initializer about the identifiers parameter.
-        requestSent = checkedRequester.request(identifiers: identifiers) { [weak self] receivedProducts in
+        requestSent = checkedRequester.request(identifiers: identifiers) { [weak self] receivedProducts, invalid in
             if let controller = self {
                 controller.products?.store = receivedProducts
                 controller.requestSent = false
@@ -111,22 +113,43 @@ class AppPurchaseController: NSObject, PurchaseController {
         return requestSent
     }
     
+    // MARK: - Price converter
+    
     func price(identifier: String) -> String {
-        assert(!identifier.isEmpty, "Empty identifier")
-        assert(products != nil, "Product store is nil")
-        assert((products?.count)! > 0, "No products")
-        assert(converter != nil, "Price converter is nil")
-        
-        guard !identifier.isEmpty, let price = converter, let product = products?[identifier] else {
+        guard let priceConverter = converter else {
+            assertionFailure("Price converter is nil")
             return ""
         }
-        return price.convert(product.price, locale: product.priceLocale)
+        
+        guard !identifier.isEmpty else {
+            assertionFailure("The identifier is required")
+            return ""
+        }
+
+        guard let store = products else {
+            assertionFailure("The products should be requested first. No price available")
+            return ""
+        }
+        
+        guard store.count > 0 else {
+            assertionFailure("The products should be requested first. No price available")
+            return ""
+        }
+
+        guard let product = store[identifier] else {
+            assertionFailure("Product with \(identifier) is not found")
+            return ""
+        }
+        
+        return priceConverter.convert(product.price, locale: product.priceLocale)
     }
+    
+    // MARK: - Purchase
     
     func buy(identifier: String) -> Bool {
         assert(!identifier.isEmpty, "Empty identifier")
         assert(products != nil, "Product store is nil")
-//        assert((products?.count)! > 0, "No products")
+        assert((products?.count)! > 0, "No products")
         assert(observer != nil, "Transaction observer is nil")
         
         guard !identifier.isEmpty, let transactions = observer, let product = products?[identifier] else {

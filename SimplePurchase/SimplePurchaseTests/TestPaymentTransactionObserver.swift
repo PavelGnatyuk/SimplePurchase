@@ -11,13 +11,17 @@ import StoreKit
 
 class TestPaymentTransactionObserver: PaymentTransactionObserver {
     var canMakePayments: Bool = true
-    var delegate: PaymentTransactionObserverDelegate?
+    weak var delegate: PaymentTransactionObserverDelegate?
     
     var hasStarted: Bool = false
     var hasStopped: Bool = false
     var hasAdded: Bool = false
     var hasFinished: Bool = false
     var hasRestored: Bool = false
+    
+    required init(delegate: PaymentTransactionObserverDelegate?) {
+        self.delegate = delegate
+    }
     
     func start() {
         hasStarted = true
