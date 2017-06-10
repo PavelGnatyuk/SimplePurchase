@@ -11,6 +11,7 @@
 
 import Foundation
 
+/// The converter from a NSNumber to String accordingly to the locale.
 protocol PriceConverter {
     /// Convert a price to a localized string
     func convert(_ price: NSNumber, locale: Locale) -> String

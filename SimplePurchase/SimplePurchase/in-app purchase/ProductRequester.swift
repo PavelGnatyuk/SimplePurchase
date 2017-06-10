@@ -3,6 +3,7 @@
 //  FairyTales
 //
 //  Protocol defining the requesting the product information from the App Store.
+//  The class allows to write unit-test for the purchase controller.
 //
 //  Created by Pavel Gnatyuk on 26/05/2017.
 //

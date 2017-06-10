@@ -28,6 +28,9 @@
 //      https://developer.apple.com/library/content/technotes/tn2387/_index.html#//apple_ref/doc/uid/DTS40014795
 //
 //
+//  Note:
+//  On the simulator the purchase does not happen by intention.
+//
 //  Created by Pavel Gnatyuk on 29/04/2017.
 //
 //
@@ -37,10 +40,8 @@ import StoreKit
 @objc
 class AppPurchaseController: NSObject, PurchaseController {
     
-    /**
-     Initial set of product identifiers for the controller works with.
-     It is a constant, making it variable will cause a lot of problems to worry about.
-    */
+    /// Initial set of product identifiers for the controller works with.
+    /// It is a constant, making it variable will cause a lot of problems to worry about.
     let identifiers: Set<String>
     
     /// Price converter: convert number and locale to a string
@@ -49,28 +50,30 @@ class AppPurchaseController: NSObject, PurchaseController {
     /// Payment transaction observer
     var observer: PaymentTransactionObserver?
     
-    /**
-     Store of the products: product information retrieved from the App Store of for all products
-     (defined by the initial set of the identifiers)
-    */
+    /// Store of the products: product information retrieved from the App Store of for all products
+    /// (defined by the initial set of the identifiers)
     var products: ProductStore?
     
-    /**
-     Function that will be called in the end of the buying procedure or in the end of the
-     restore purchases process (for each product).
-    */
+    /// Function that will be called in the end of the buying procedure or in the end of the
+    /// restore purchases process (for each product).
     var onComplete: (([String: String])->Void)?
     
     /// Request product information from the App Store
     var requester: ProductRequester?
     
-    /// Flag that a request was sent and no response has been received.
+    /// Flag that a request was sent and no response has been received yet.
     var requestSent: Bool = false
 
+    /// The property is `true` when the instance is ready to request the product information:
+    /// - the instance was initialized correctly with a non-empty set of identifiers.
+    /// - the requester is not nil
     var isReadyToRequest: Bool {
         return identifiers.count > 0 && requester != nil
     }
 
+    /// The property is `true` when the instance is ready to perform an in-app purchase operation:
+    /// - the product information has been retrieved from the App Store
+    /// - the payment queue observer is not nil.
     var isReadyToPurchase: Bool {
         guard let info = products else {
             return false
@@ -78,6 +81,7 @@ class AppPurchaseController: NSObject, PurchaseController {
         return info.count > 0 && observer != nil
     }
     
+    /// The product information has been retrieved successfully.
     var containsProducts: Bool {
         guard let info = products else {
             return false
@@ -120,7 +124,7 @@ class AppPurchaseController: NSObject, PurchaseController {
             assertionFailure("Price converter is nil")
             return ""
         }
-        
+
         guard !identifier.isEmpty else {
             assertionFailure("The identifier is required")
             return ""
@@ -146,10 +150,18 @@ class AppPurchaseController: NSObject, PurchaseController {
     
     // MARK: - Purchase
     
+    /**
+     Perform the in-app purchasing.
+     - Parameter identifier: the string product identifier (ex. com.app.product1)
+     - Return: `Boolean` value which is `true` if the payment was successfully added to the transaction queue.
+     Note:
+     The payment will not be added to the payment queue under the simulator. The callback closure will be called 
+     immediatelly.
+    */
     func buy(identifier: String) -> Bool {
         assert(!identifier.isEmpty, "Empty identifier")
         assert(products != nil, "Product store is nil")
-        assert((products?.count)! > 0, "No products")
+        //assert((products?.count)! > 0, "No products")
         assert(observer != nil, "Transaction observer is nil")
         
         guard !identifier.isEmpty, let transactions = observer, let product = products?[identifier] else {

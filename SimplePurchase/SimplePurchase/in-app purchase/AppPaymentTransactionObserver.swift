@@ -4,6 +4,7 @@
 //  Payment transaction observer - actually a wrapper for SKPaymentQueue adding new payment to it
 //  and handling all states of this payment in the queue.
 //
+//  The class allows to write unit-test for the purchase controller.
 //
 //  Created by Pavel Gnatyuk on 29/04/2017.
 //
