@@ -1,10 +1,34 @@
 //
 //  PurchaseController.swift
 //
-//  The main functions of the purchase controller are the following:
-//  1. Request products' information
-//  2. Buy a product.
-//  3. Restore already purchased products.
+//  Requirements:
+//  1. Contain a set of product identifiers (in order to get the products from the App Store).
+//  2. Retrieve product information from the App store (In order to get product prices and buy the products).
+//  3. Buy a product.
+//  4. Restore already purchased products.
+//  5. If a purchase process was interrupted (by a crash?), the app should continue with the in-app purchase after re-start.
+//
+//
+//  References:
+//
+//  1. Guides and Sample Code. In-App Purchase Programming Guide
+//      https://developer.apple.com/library/content/documentation/NetworkingInternet/Conceptual/StoreKitGuide/Introduction.html#//apple_ref/doc/uid/TP40008267
+//
+//  2. API Reference. StoreKit.
+//      https://developer.apple.com/reference/storekit
+//
+//  3. WWDC 2016. Session 702
+//      https://developer.apple.com/videos/play/wwdc2016/702/
+//
+//  4. Looks like a good resource to be used as a references:
+//      [SwiftyStoreKit](https://github.com/bizz84/SwiftyStoreKit)
+//      This project contains the receipt verification code.
+//
+//  5. Technical Note TN2387. In-App Purchase Best Practices
+//      https://developer.apple.com/library/content/technotes/tn2387/_index.html#//apple_ref/doc/uid/DTS40014795
+//
+//  6. Five In-App Purchase Mistakes to Avoid
+//      https://cocoacasts.com/five-in-app-purchase-mistakes-to-avoid/
 //
 //  Created by Pavel Gnatyuk on 29/04/2017.
 //
@@ -45,8 +69,8 @@ protocol PurchaseController {
      Function that will be called in the end of the buying procedure or in the end of the
      restore purchases process (for each product).
      */
-    var onComplete: (([String: String])->Void)? { get set }
-    
+    var onComplete: ((_ identifier: String, _ purchased: Bool, _ error: String) -> Void)? { get set }
+
     /**
      Start payment transaction observer. It allows to continue with an interrupted purchase.
      */
@@ -83,13 +107,4 @@ protocol PurchaseController {
      Restore payment transactions
      */
     func restore()
-}
-
-// MARK: - Constants
-
-@objc
-class PurchaseControllerConsts: NSObject {
-    static let kResponseAttributeIdentifier = "identifier"
-    static let kResponseAttributeSuccess    = "success"
-    static let kResponseAttributeError      = "error"
 }

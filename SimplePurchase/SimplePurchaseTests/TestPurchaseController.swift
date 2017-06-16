@@ -25,7 +25,7 @@ class TestPurchaseController: PurchaseController {
         self.init(identifiers: Set<String>())
     }
     
-    var onComplete: (([String: String])->Void)?
+    var onComplete: ((String, Bool, String) -> Void)?
     
     func start() {
     }

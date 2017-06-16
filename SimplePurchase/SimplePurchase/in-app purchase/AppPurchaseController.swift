@@ -1,33 +1,6 @@
 //
 //  AppPurchaseController.swift
 //
-//  Requirements:
-//  1. Contain a set of product identifiers (in order to get the products from the App Store).
-//  2. Retrieve product information from the App store (In order to get product prices and buy the products).
-//  3. Buy a product.
-//  4. Restore already purchased products.
-//  5. If a purchase process was interrupted (by a crash?), the app should continue with the in-app purchase after re-start.
-//
-//
-//  References:
-//
-//  1. Guides and Sample Code. In-App Purchase Programming Guide
-//      https://developer.apple.com/library/content/documentation/NetworkingInternet/Conceptual/StoreKitGuide/Introduction.html#//apple_ref/doc/uid/TP40008267
-//
-//  2. API Reference. StoreKit.
-//      https://developer.apple.com/reference/storekit
-//
-//  3. WWDC 2016. Session 702
-//      https://developer.apple.com/videos/play/wwdc2016/702/
-//
-//  4. Looks like a good resource to be used as a references:
-//      [SwiftyStoreKit](https://github.com/bizz84/SwiftyStoreKit)
-//      This project contains the receipt verification code.
-//
-//  5. Technical Note TN2387. In-App Purchase Best Practices
-//      https://developer.apple.com/library/content/technotes/tn2387/_index.html#//apple_ref/doc/uid/DTS40014795
-//
-//
 //  Note:
 //  On the simulator the purchase does not happen by intention.
 //
@@ -56,7 +29,7 @@ class AppPurchaseController: NSObject, PurchaseController {
     
     /// Function that will be called in the end of the buying procedure or in the end of the
     /// restore purchases process (for each product).
-    var onComplete: (([String: String])->Void)?
+    var onComplete: ((String, Bool, String) -> Void)?
     
     /// Request product information from the App Store
     var requester: ProductRequester?
@@ -151,9 +124,6 @@ class AppPurchaseController: NSObject, PurchaseController {
     // MARK: - Purchase
     
     /**
-     Perform the in-app purchasing.
-     - Parameter identifier: the string product identifier (ex. com.app.product1)
-     - Return: `Boolean` value which is `true` if the payment was successfully added to the transaction queue.
      Note:
      The payment will not be added to the payment queue under the simulator. The callback closure will be called 
      immediatelly.
@@ -198,15 +168,20 @@ extension AppPurchaseController: PaymentTransactionObserverDelegate {
     }
     
     /**
-     The transaction failed. The user could cancel the purchase operation.
+     The transaction failed. The user could cancel the purchase operation and in this case the error text
+     should be empty (Apple gives "Could not connect to iTunes" or something like that).
      */
     func onFailed(_ transaction: SKPaymentTransaction) {
-        if let error = transaction.error as? SKError, error.code == SKError.paymentCancelled {
-            self.onComplete?([PurchaseControllerConsts.kResponseAttributeIdentifier: transaction.payment.productIdentifier,
-                              PurchaseControllerConsts.kResponseAttributeSuccess: "NO",
-                              PurchaseControllerConsts.kResponseAttributeError: error.localizedDescription])
-        }
+        // Let's finish the transaction anyway.
         self.observer?.finish(transaction)
+        
+        // Detect the error description
+        var errorDescription = ""
+        if let error = transaction.error as? SKError, error.code != SKError.paymentCancelled {
+            errorDescription = error.localizedDescription
+        }
+        
+        self.onComplete?(transaction.payment.productIdentifier, false, errorDescription)
     }
     
     /**
@@ -223,8 +198,7 @@ extension AppPurchaseController: PaymentTransactionObserverDelegate {
      Finish the payment transaction and call the complete callback.
      */
     private func finish(identifier: String, transaction: SKPaymentTransaction) {
+        self.onComplete?(identifier, true, "")
         self.observer?.finish(transaction)
-        self.onComplete?([PurchaseControllerConsts.kResponseAttributeIdentifier: identifier,
-                          PurchaseControllerConsts.kResponseAttributeSuccess: "YES"])
     }
 }
